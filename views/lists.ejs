@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+
+  <div class="jumbotron text-center">
+    <div class="container">
+
+   <form action="/newList" method="POST">
+            <div class="form-group">
+              <label for="Title">Title</label>
+              <input type="text" class="form-control" name="title">
+            </div>
+            <div class="form-group">
+               <div class="form-group">
+              <label for="notes">notes</label>
+              <input type="text" class="form-control" name="notes">
+            </div>
+            <div class="form-group">
+            <button type="submit" value="<% user%>" name="user" class="btn btn-dark">Submit</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+
+
+
+  <%- include('partials/footer') %>
