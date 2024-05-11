@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
 import bcrypt from "bcrypt";
+import env from "dotenv"
+
 
 const app = express();
 const port = 3000;
@@ -9,9 +11,9 @@ const saltRounds = 10;
 
 
 
-let userID = 0 ;
+;
 
-
+env.config();
 
 const db = new pg.Client({
   user: process.env.PG_USER,
@@ -28,32 +30,55 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 
-async function userInfo(id){
 
 
-const result = await db.query("SELECT * FROM userList WHERE userID = $1",[id])
 
-let notes = []
 
-console.log(result)
-result.rows.forEach((item) =>{ item.notes} )
-return userLists
-}
+// async function userId(email){
+
+
+
+//   const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
+//     email,
+//   ]);
+
+// const result = await db.query("SELECT * FROM userList WHERE userID = $1",[id])
+
+// let notes = []
+
+// console.log(checkResult.rows[0].id)
+// result.rows.forEach((item) =>{ item.notes} )
+
+// }
+
+// let email = await username()
 
 let dbResult = await db.query("SELECT * FROM users")
 let users  = dbResult.rows
+let userID = 1
 
+async function checkNotes() {
+  const result = await db.query("SELECT country_code FROM visited_countries WHERE user_id = $1", [userID]);
+
+
+  let notes = [];
+  result.rows.forEach((note) => {
+    notes.push( {title:note.title,note:note.notes} );
+  });
+  return notes;
+}
 app.get("/lists",async (req, res) => {
 
-
+  
   const result = await db.query("SELECT * FROM userlist WHERE userid = $1 ;",[userID])
 
 const data = result.rows
 
-// console.log(userID + "userId")
-// console.log(data)
+console.log(userID + "userId")
+console.log(data + " userData")
 
-const userData = {user:data.id,
+const userData = {user:userID,
+  info:data
 }
 
 
@@ -99,7 +124,7 @@ bcrypt.hash(password,saltRounds,async (err,hash)=>{
         [email, hash]
       );
       // console.log(result);
-      res.render("lists.ejs");
+      res.redirect("/lists");
   }
   
 })
@@ -129,7 +154,8 @@ app.post("/login", async (req, res) => {
     if (result.rows.length > 0) {
       const user = result.rows[0];
       console.log(user)
-userID = user.id
+
+console.log(userID)
       const storedHashedPassword = user.password;
 bcrypt.compare(loginPassword,storedHashedPassword, (err,result)=>{
   if(err){
@@ -139,6 +165,11 @@ bcrypt.compare(loginPassword,storedHashedPassword, (err,result)=>{
   else{
 
     if(result){
+
+      userID = user.id
+
+
+      console.log(userID)
        res.redirect("/lists");
     }else {
         res.send("Incorrect Password");
@@ -160,13 +191,13 @@ app.post("/newList",async (req, res) => {
 const title = req.body.title
 const notes = req.body.notes
 const id = req.body.user
+ 
+userID = id
 
 
-console.log(id)
-// if(title.length > 0){
+console.log(id + ' HEY')
 
-//   console.log(userID)
-// await db.query("INSERT INTO userlist (title, notes, userid) VALUES ($1,$2,$3)",[title,notes,userID])
+ db.query("INSERT INTO userlist (title, notes, userid) VALUES ($1,$2,$3)",[title,notes,userID])
 // }
   
 
