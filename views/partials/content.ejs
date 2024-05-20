@@ -1,12 +1,32 @@
 <div>
  <% info.forEach(function(item) { %>
-     
- <h2> Title : <%=  item.title %>   </h2>    
 
- <p>Note: <%= item.notes%> </p>
-      <% }); %>
+  <div class="item">
+        <form action="/delete" method="post">
+          <input type="checkbox" onchange="this.form.submit()" name="deleteItemId" value="<%= item.id %>">
+        </form>
 
+        <h2 id="title<%=item.id%>">
+          <%= item.title %> 
+        </h2>
+<br/>
+<p id="title<%=item.id%>">
+          <%= item.notes %>
+        </p>
+        <form class="edit" action="/edit" method="post">
+          <input type="hidden" name="updatedItemId" value="<%= item.id %>">
+          <input id="input<%=item.id%>" type="text" name="updatedItemTitle" value="<%= item.title %>" autocomplete="off"
+            autofocus="true" hidden="true" />
+          <button id="done<%=item.id%>" class="edit" type="submit" hidden="true"><img class="icon"
+              src="/icons/check-solid.svg" alt="tick image"></button>
+        </form>
+        
+        <button id="edit<%=item.id%>" class="edit" onclick="handler('<%=item.id%>')"><img class="icon"
+            src="icons/pencil-solid.svg" alt="pencil image"></button>
+      </div>
+ 
 
+        
+  </div>
 
-
-</div>
+ <% }); %>

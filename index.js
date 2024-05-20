@@ -31,42 +31,11 @@ app.use(express.static("public"));
 
 
 
-
-
-
-// async function userId(email){
-
-
-
-//   const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
-//     email,
-//   ]);
-
-// const result = await db.query("SELECT * FROM userList WHERE userID = $1",[id])
-
-// let notes = []
-
-// console.log(checkResult.rows[0].id)
-// result.rows.forEach((item) =>{ item.notes} )
-
-// }
-
-// let email = await username()
-
 let dbResult = await db.query("SELECT * FROM users")
 let users  = dbResult.rows
 let userID = 1
 
-async function checkNotes() {
-  const result = await db.query("SELECT country_code FROM visited_countries WHERE user_id = $1", [userID]);
 
-
-  let notes = [];
-  result.rows.forEach((note) => {
-    notes.push( {title:note.title,note:note.notes} );
-  });
-  return notes;
-}
 app.get("/lists",async (req, res) => {
 
   
@@ -119,11 +88,17 @@ bcrypt.hash(password,saltRounds,async (err,hash)=>{
   if(err){
     console.log("error hashing password:",err)
   } else{
-     const result = await db.query(
+   await db.query(
         "INSERT INTO users (email, password) VALUES ($1, $2)",
         [email, hash]
       );
-      // console.log(result);
+
+      const result = await db.query(
+        "SELECT id FROM users WHERE email = $1",
+        [email]
+      );
+      console.log(result.rows[0].id);
+      userID = result.rows[0].id
       res.redirect("/lists");
   }
   
@@ -190,20 +165,34 @@ bcrypt.compare(loginPassword,storedHashedPassword, (err,result)=>{
 app.post("/newList",async (req, res) => {
 const title = req.body.title
 const notes = req.body.notes
-const id = req.body.user
+// const id = req.body.user
  
-userID = id
+// userID = id
 
 
-console.log(id + ' HEY')
+console.log(userID + ' HEY')
 
- db.query("INSERT INTO userlist (title, notes, userid) VALUES ($1,$2,$3)",[title,notes,userID])
+//  db.query("INSERT INTO userlist (title, notes, userid) VALUES ($1,$2,$3)",[title,notes,userID])
 // }
   
 
   res.redirect("/lists");
 });
 
+
+app.post("/edit",async (req, res) => {
+  const title = req.body.updatedItemTitle
+  const notes = req.body.updatedItemNote
+  // const id = req.body.user
+   
+  
+   db.query("UPDATE userlist SET title = $1, notes = $2 WHERE title = $1",[title,notes])
+  
+    
+  
+    res.redirect("/lists");
+  });
+  
 
 
 
